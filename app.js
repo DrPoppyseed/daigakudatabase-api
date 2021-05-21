@@ -70,6 +70,6 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(result => {
-    app.listen(PORT)
+    app.listen(5000)
   })
   .catch(err => console.log(err))
