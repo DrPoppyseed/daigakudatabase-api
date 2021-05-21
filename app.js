@@ -14,7 +14,7 @@ const usersRoutes = require('./routes/users')
 const schoolsRoutes = require('./routes/schools')
 const userRoutes = require('./routes/user')
 
-const PORT = 3080
+const PORT = process.env.PORT || 5000
 const app = express()
 app.use(logger('dev'))
 app.use(helmet())
@@ -70,6 +70,6 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(result => {
-    app.listen(5000)
+    app.listen(PORT)
   })
   .catch(err => console.log(err))
