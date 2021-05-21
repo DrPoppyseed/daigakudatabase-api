@@ -14,7 +14,7 @@ const usersRoutes = require('./routes/users')
 const schoolsRoutes = require('./routes/schools')
 const userRoutes = require('./routes/user')
 
-const PORT = process.env.LOCAL_PORT
+const PORT = 3080
 const app = express()
 app.use(logger('dev'))
 app.use(helmet())
