@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const schoolSchema = new Schema({
+const schools_v1Schema = new Schema({
   uuid: String,
   opeid: String,
   opeid6: String,
@@ -9,12 +9,22 @@ const schoolSchema = new Schema({
   name_jp: String,
   institutionData: {
     uuid: String,
+    unitid: String,
     name_en: String,
     name_jp: String,
     card_img_src: String,
     card_img_alt: String,
     page_img_src: String,
     page_img_alt: String,
+    card_img_srcs_jpeg: [String],
+    card_img_srcs_webp: [String],
+    page_img_srcs_jpeg: [String],
+    page_img_srcs_webp: [String],
+    mini_img_srcs_jpeg: [String],
+    mini_img_srcs_webp: [String],
+    card_img_alts: [String],
+    page_img_alts: [String],
+    mini_img_alts: [String],
     url: String,
     school_homepage_url: String,
     price_calculator_url: String,
@@ -57,50 +67,6 @@ const schoolSchema = new Schema({
       },
     },
   },
-  majors: [
-    {
-      majorCIP: String,
-      majorTitle: String,
-      majorDesc: String,
-      majorTitleJap: String,
-      majorDescJap: String,
-      programsPerCredLevInDept: {
-        1: Number,
-        2: Number,
-        3: Number,
-        4: Number,
-        5: Number,
-        6: Number,
-        7: Number,
-        8: Number,
-      },
-      programs: [
-        {
-          code: String,
-          codeFull: String,
-          name: String,
-          credLev: String,
-          credDesc: String,
-          credDescJap: String,
-          graduates: String,
-          medianIncome1: String,
-          medianIncome2: String,
-          nameJap: String,
-          descJap: String,
-        },
-      ],
-    },
-  ],
-  programsPerCredLev: {
-    1: Number,
-    2: Number,
-    3: Number,
-    4: Number,
-    5: Number,
-    6: Number,
-    7: Number,
-    8: Number,
-  },
 })
 
-module.exports = mongoose.model('School', schoolSchema)
+module.exports = mongoose.model('Schools_v1', schools_v1Schema)

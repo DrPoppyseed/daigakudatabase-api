@@ -1,6 +1,7 @@
 const _ = require('lodash')
 
 const School = require('../models/school')
+const Schools_v1 = require('../models/schools_v1')
 const UserSchoolLike = require('../models/userSchoolLike')
 const GroupChip = require('../models/groupChip')
 const ObjectId = require('mongodb').ObjectId
@@ -109,11 +110,11 @@ exports.getSchools = (req, res, next) => {
     query = parsedUrlQueries != {} && { ...parsedUrlQueries }
   }
 
-  School.find(query)
+  Schools_v1.find(query)
     .countDocuments()
     .then(numSchools => {
       totalSchoolsFound = numSchools
-      return School.find(query)
+      return Schools_v1.find(query)
         .skip((page - 1) * schoolsPerPage)
         .limit(~~schoolsPerPage)
     })
@@ -162,7 +163,7 @@ exports.getMyPage = (req, res, next) => {
 
   const SCHOOLS_PER_PAGE = 6
 
-  School.find({ opeid6: { $in: [...schoolIds] } })
+  Schools_v1.find({ opeid6: { $in: [...schoolIds] } })
     .skip((page - 1) * SCHOOLS_PER_PAGE)
     .limit(SCHOOLS_PER_PAGE)
     .then(result => {
@@ -184,7 +185,7 @@ exports.getSchoolById = (req, res, next) => {
   console.log('🚀 ~ file: schoolsController.js ~ line 188 ~ token', token)
   let userId = !!token ? token.user_id : null
 
-  School.find({
+  Schools_v1.find({
     'institutionData.url': schoolId,
   })
     .then(async school => {
