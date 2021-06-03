@@ -53,3 +53,5 @@ const majorsSchema = new Schema({
     8: Number,
   },
 })
+
+module.exports = mongoose.model('Majors', majorsSchema)

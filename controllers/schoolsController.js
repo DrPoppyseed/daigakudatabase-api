@@ -2,6 +2,7 @@ const _ = require('lodash')
 
 const School = require('../models/school')
 const Schools_v1 = require('../models/schools_v1')
+const Majors = require('../models/majors')
 const UserSchoolLike = require('../models/userSchoolLike')
 const GroupChip = require('../models/groupChip')
 const ObjectId = require('mongodb').ObjectId
@@ -214,3 +215,21 @@ exports.getSchoolById = (req, res, next) => {
 }
 /** insert json file data to mongodb database */
 exports.insertSchools = (req, res, next) => {}
+
+exports.getMajorsById = (req, res, next) => {
+  const schoolId = req.params.schoolId
+  // schoolId for getMajorsById is uuid
+  Majors.findOne({ uuid: schoolId })
+    .then(async majors => {
+      console.log(majors)
+      res.status(200).json({
+        message: 'Majors fetched',
+        majors: majors,
+      })
+    })
+    .catch(err => {
+      console.log(err)
+      if (!err.statusCode) err.statusCode = 500
+      next(err)
+    })
+}
