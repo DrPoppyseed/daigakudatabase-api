@@ -42,7 +42,11 @@ const schoolsSchema = new Schema({
       },
     ],
     admission_rate: Number,
-    sat: { low: Number, average: Number, high: Number },
+    sat: {
+      low: Schema.Types.Mixed,
+      average: Schema.Types.Mixed,
+      high: Schema.Types.Mixed,
+    },
     cost: {
       academic_year_avg: Number,
       in_state_tuition: Number,

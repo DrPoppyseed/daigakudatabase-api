@@ -19,6 +19,7 @@ exports.getSchools = (req, res, next) => {
   let parsedUrlQueries = {}
   let schoolTypes = []
   let yearTypes = []
+  let sort = 'default'
 
   if (parseUrl.length > 1) {
     parseUrl.shift()
@@ -75,19 +76,14 @@ exports.getSchools = (req, res, next) => {
             'institutionData.cost.academic_year_avg': { $gte: ~~low },
           }
         }
-      }
-
-      // else if (key === 'toefl') {
-      //   parsedUrlQueries = {
-      //     ...parsedUrlQueries,
-      //     'institutionData.toeflRange': { $gte: ~~value },
-      //   }
-      // }
-      else if (key === 'state') {
+      } else if (key === 'state') {
         parsedUrlQueries = {
           ...parsedUrlQueries,
           'institutionData.state_postcode': value,
         }
+      } else if (key === 'sortby') {
+        sort = value
+        console.log(sort)
       }
     })
   }
@@ -115,56 +111,283 @@ exports.getSchools = (req, res, next) => {
   }
 
   let totalSchoolsFound
-  let query = null
 
-  if (Object.keys(parsedUrlQueries).length !== 0) {
-    query = parsedUrlQueries != {} && { ...parsedUrlQueries }
-  }
-
-  Schools.find(query)
-    .countDocuments()
-    .then(numSchools => {
-      totalSchoolsFound = numSchools
-      return Schools.find(query)
-        .skip((page - 1) * schoolsPerPage)
-        .limit(~~schoolsPerPage)
-    })
-    .then(async schools => {
-      if (!schools) {
-        const error = new Error('Failed to fetch schools')
-        error.statusCode = 404
-        console.log(error)
-        throw error
+  if (sort === 'tuition-ascending') {
+    let query = null
+    if (Object.keys(parsedUrlQueries).length !== 0) {
+      query = {
+        $and: [
+          parsedUrlQueries,
+          { 'institutionData.cost.academic_year_avg': { $ne: 0 } },
+        ],
       }
-
-      let awaitSchools = await Promise.all(
-        schools.map(async school => {
-          const temp = await UserSchoolLike.exists({
-            userId: userId,
-            school_uuid: school.uuid,
-          })
-            .then(result => {
-              return { ...school.institutionData, isLiked: result }
-            })
-            .catch(err => {
-              console.log(err)
-              if (!err.statusCode) err.statusCode = 500
-              next(err)
-            })
-          return temp
-        })
-      )
-      res.status(200).json({
-        message: 'Schools fetched!',
-        totalSchoolsFound: totalSchoolsFound,
-        schools: awaitSchools,
+    }
+    Schools.find(query)
+      .countDocuments()
+      .then(numSchools => {
+        totalSchoolsFound = numSchools
+        return Schools.find(query)
+          .sort({ 'institutionData.cost.academic_year_avg': 1 })
+          .skip((page - 1) * schoolsPerPage)
+          .limit(~~schoolsPerPage)
       })
-    })
-    .catch(err => {
-      console.log(err)
-      if (!err.statusCode) err.statusCode = 500
-      next(err)
-    })
+      .then(async schools => {
+        if (!schools) {
+          const error = new Error('Failed to fetch schools')
+          error.statusCode = 404
+          console.log(error)
+          throw error
+        }
+
+        let awaitSchools = await Promise.all(
+          schools.map(async school => {
+            const temp = await UserSchoolLike.exists({
+              userId: userId,
+              school_uuid: school.uuid,
+            })
+              .then(result => {
+                return { ...school.institutionData, isLiked: result }
+              })
+              .catch(err => {
+                console.log(err)
+                if (!err.statusCode) err.statusCode = 500
+                next(err)
+              })
+            return temp
+          })
+        )
+
+        res.status(200).json({
+          message: 'Schools fetched!',
+          totalSchoolsFound: totalSchoolsFound,
+          schools: awaitSchools,
+        })
+      })
+      .catch(err => {
+        console.log(err)
+        if (!err.statusCode) err.statusCode = 500
+        next(err)
+      })
+  } else if (sort === 'sat-ascending') {
+    let query = null
+    if (Object.keys(parsedUrlQueries).length !== 0) {
+      query = {
+        $and: [
+          parsedUrlQueries,
+          { 'institutionData.sat.averagerage': { $ne: '-' } },
+        ],
+      }
+    }
+    Schools.find(query)
+      .countDocuments()
+      .then(numSchools => {
+        totalSchoolsFound = numSchools
+        return Schools.find(query)
+          .sort('institutionData.sat.averagerage')
+          .skip((page - 1) * schoolsPerPage)
+          .limit(~~schoolsPerPage)
+      })
+      .then(async schools => {
+        if (!schools) {
+          const error = new Error('Failed to fetch schools')
+          error.statusCode = 404
+          console.log(error)
+          throw error
+        }
+
+        let awaitSchools = await Promise.all(
+          schools.map(async school => {
+            const temp = await UserSchoolLike.exists({
+              userId: userId,
+              school_uuid: school.uuid,
+            })
+              .then(result => {
+                return { ...school.institutionData, isLiked: result }
+              })
+              .catch(err => {
+                console.log(err)
+                if (!err.statusCode) err.statusCode = 500
+                next(err)
+              })
+            return temp
+          })
+        )
+
+        res.status(200).json({
+          message: 'Schools fetched!',
+          totalSchoolsFound: totalSchoolsFound,
+          schools: awaitSchools,
+        })
+      })
+      .catch(err => {
+        console.log(err)
+        if (!err.statusCode) err.statusCode = 500
+        next(err)
+      })
+  } else if (sort === 'tuition-descending') {
+    let query = null
+    if (Object.keys(parsedUrlQueries).length !== 0) {
+      query = {
+        $and: [
+          parsedUrlQueries,
+          { 'institutionData.cost.academic_year_avg': { $ne: 0 } },
+        ],
+      }
+    }
+    Schools.find(query)
+      .countDocuments()
+      .then(numSchools => {
+        totalSchoolsFound = numSchools
+        return Schools.find(query)
+          .sort('-institutionData.cost.academic_year_avg')
+          .skip((page - 1) * schoolsPerPage)
+          .limit(~~schoolsPerPage)
+      })
+      .then(async schools => {
+        if (!schools) {
+          const error = new Error('Failed to fetch schools')
+          error.statusCode = 404
+          console.log(error)
+          throw error
+        }
+
+        let awaitSchools = await Promise.all(
+          schools.map(async school => {
+            const temp = await UserSchoolLike.exists({
+              userId: userId,
+              school_uuid: school.uuid,
+            })
+              .then(result => {
+                return { ...school.institutionData, isLiked: result }
+              })
+              .catch(err => {
+                console.log(err)
+                if (!err.statusCode) err.statusCode = 500
+                next(err)
+              })
+            return temp
+          })
+        )
+
+        res.status(200).json({
+          message: 'Schools fetched!',
+          totalSchoolsFound: totalSchoolsFound,
+          schools: awaitSchools,
+        })
+      })
+      .catch(err => {
+        console.log(err)
+        if (!err.statusCode) err.statusCode = 500
+        next(err)
+      })
+  } else if (sort === 'sat-descending') {
+    let query = null
+    if (Object.keys(parsedUrlQueries).length !== 0) {
+      query = {
+        $and: [
+          parsedUrlQueries,
+          { 'institutionData.sat.average': { $ne: '-' } },
+        ],
+      }
+    }
+    Schools.find(query)
+      .countDocuments()
+      .then(numSchools => {
+        totalSchoolsFound = numSchools
+        return Schools.find(query)
+          .sort('-institutionData.sat.average')
+          .skip((page - 1) * schoolsPerPage)
+          .limit(~~schoolsPerPage)
+      })
+      .then(async schools => {
+        if (!schools) {
+          const error = new Error('Failed to fetch schools')
+          error.statusCode = 404
+          console.log(error)
+          throw error
+        }
+
+        let awaitSchools = await Promise.all(
+          schools.map(async school => {
+            const temp = await UserSchoolLike.exists({
+              userId: userId,
+              school_uuid: school.uuid,
+            })
+              .then(result => {
+                return { ...school.institutionData, isLiked: result }
+              })
+              .catch(err => {
+                console.log(err)
+                if (!err.statusCode) err.statusCode = 500
+                next(err)
+              })
+            return temp
+          })
+        )
+
+        res.status(200).json({
+          message: 'Schools fetched!',
+          totalSchoolsFound: totalSchoolsFound,
+          schools: awaitSchools,
+        })
+      })
+      .catch(err => {
+        console.log(err)
+        if (!err.statusCode) err.statusCode = 500
+        next(err)
+      })
+  } else {
+    let query = null
+
+    if (Object.keys(parsedUrlQueries).length !== 0) {
+      query = parsedUrlQueries != {} && { ...parsedUrlQueries }
+    }
+    Schools.find(query)
+      .countDocuments()
+      .then(numSchools => {
+        totalSchoolsFound = numSchools
+        return Schools.find(query)
+          .skip((page - 1) * schoolsPerPage)
+          .limit(~~schoolsPerPage)
+      })
+      .then(async schools => {
+        if (!schools) {
+          const error = new Error('Failed to fetch schools')
+          error.statusCode = 404
+          console.log(error)
+          throw error
+        }
+
+        let awaitSchools = await Promise.all(
+          schools.map(async school => {
+            const temp = await UserSchoolLike.exists({
+              userId: userId,
+              school_uuid: school.uuid,
+            })
+              .then(result => {
+                return { ...school.institutionData, isLiked: result }
+              })
+              .catch(err => {
+                console.log(err)
+                if (!err.statusCode) err.statusCode = 500
+                next(err)
+              })
+            return temp
+          })
+        )
+
+        res.status(200).json({
+          message: 'Schools fetched!',
+          totalSchoolsFound: totalSchoolsFound,
+          schools: awaitSchools,
+        })
+      })
+      .catch(err => {
+        console.log(err)
+        if (!err.statusCode) err.statusCode = 500
+        next(err)
+      })
+  }
 }
 
 exports.getMyPage = (req, res, next) => {
