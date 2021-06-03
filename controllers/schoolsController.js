@@ -1,7 +1,6 @@
 const _ = require('lodash')
 
-const School = require('../models/school')
-const Schools_v1 = require('../models/schools_v1')
+const Schools = require('../models/schools')
 const Majors = require('../models/majors')
 const UserSchoolLike = require('../models/userSchoolLike')
 const GroupChip = require('../models/groupChip')
@@ -61,12 +60,23 @@ exports.getSchools = (req, res, next) => {
       } else if (key === 'tuition') {
         const low = value.split(',')[0]
         const high = value.split(',')[1]
-        parsedUrlQueries = {
-          ...parsedUrlQueries,
-          'institutionData.cost.in_state_tuition': { $lte: ~~high },
-          'institutionData.out_of_state_tuition': { $gte: ~~low },
+        console.log(low, high, typeof ~~low)
+        if (~~high != 60000) {
+          parsedUrlQueries = {
+            ...parsedUrlQueries,
+            $and: [
+              { 'institutionData.cost.academic_year_avg': { $lte: ~~high } },
+              { 'institutionData.cost.academic_year_avg': { $gte: ~~low } },
+            ],
+          }
+        } else {
+          parsedUrlQueries = {
+            ...parsedUrlQueries,
+            'institutionData.cost.academic_year_avg': { $gte: ~~low },
+          }
         }
       }
+
       // else if (key === 'toefl') {
       //   parsedUrlQueries = {
       //     ...parsedUrlQueries,
@@ -111,11 +121,11 @@ exports.getSchools = (req, res, next) => {
     query = parsedUrlQueries != {} && { ...parsedUrlQueries }
   }
 
-  Schools_v1.find(query)
+  Schools.find(query)
     .countDocuments()
     .then(numSchools => {
       totalSchoolsFound = numSchools
-      return Schools_v1.find(query)
+      return Schools.find(query)
         .skip((page - 1) * schoolsPerPage)
         .limit(~~schoolsPerPage)
     })
@@ -164,7 +174,7 @@ exports.getMyPage = (req, res, next) => {
 
   const SCHOOLS_PER_PAGE = 6
 
-  Schools_v1.find({ opeid6: { $in: [...schoolIds] } })
+  Schools.find({ opeid6: { $in: [...schoolIds] } })
     .skip((page - 1) * SCHOOLS_PER_PAGE)
     .limit(SCHOOLS_PER_PAGE)
     .then(result => {
@@ -186,7 +196,7 @@ exports.getSchoolById = (req, res, next) => {
   console.log('🚀 ~ file: schoolsController.js ~ line 188 ~ token', token)
   let userId = !!token ? token.user_id : null
 
-  Schools_v1.find({
+  Schools.find({
     'institutionData.url': schoolId,
   })
     .then(async school => {
@@ -221,7 +231,6 @@ exports.getMajorsById = (req, res, next) => {
   // schoolId for getMajorsById is uuid
   Majors.findOne({ uuid: schoolId })
     .then(async majors => {
-      console.log(majors)
       res.status(200).json({
         message: 'Majors fetched',
         majors: majors,

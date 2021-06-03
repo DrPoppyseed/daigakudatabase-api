@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const schools_v1Schema = new Schema({
+const schoolsSchema = new Schema({
   uuid: String,
   opeid: String,
   opeid6: String,
@@ -12,10 +12,6 @@ const schools_v1Schema = new Schema({
     unitid: String,
     name_en: String,
     name_jp: String,
-    card_img_src: String,
-    card_img_alt: String,
-    page_img_src: String,
-    page_img_alt: String,
     card_img_srcs_jpeg: [String],
     card_img_srcs_webp: [String],
     page_img_srcs_jpeg: [String],
@@ -38,7 +34,7 @@ const schools_v1Schema = new Schema({
     rating_score: Number,
     ratings: Number,
     summary: String,
-    location: { lat: Number, lon: Number },
+    location: { lat: String, lon: String },
     unique_flags: [
       {
         type: Schema.Types.ObjectId,
@@ -48,12 +44,12 @@ const schools_v1Schema = new Schema({
     admission_rate: Number,
     sat: { low: Number, average: Number, high: Number },
     cost: {
-      academic_year_avg: String,
-      in_state_tuition: String,
-      out_of_state_tuition: String,
+      academic_year_avg: Number,
+      in_state_tuition: Number,
+      out_of_state_tuition: Number,
     },
     students: {
-      size: String,
+      size: Number,
       men: Number,
       women: Number,
       entry_age_avg: Number,
@@ -69,4 +65,4 @@ const schools_v1Schema = new Schema({
   },
 })
 
-module.exports = mongoose.model('Schools_v1', schools_v1Schema)
+module.exports = mongoose.model('Schools', schoolsSchema)
