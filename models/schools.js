@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const Mixed = Schema.Types.Mixed
 
 const schoolsSchema = new Schema({
   general: {
@@ -168,70 +169,70 @@ const schoolsSchema = new Schema({
     },
     tuition: {
       books_and_supplies: {
-        '2017': Number,
-        '2018': Number,
-        '2019': Number
+        '2017': Mixed,
+        '2018': Mixed,
+        '2019': Mixed
       },
       in_state: {
         '2017': {
-          fees: Number,
-          tuition: Number,
-          tuition_and_fees: Number
+          fees: Mixed,
+          tuition: Mixed,
+          tuition_and_fees: Mixed
         },
         '2018': {
-          fees: Number,
-          tuition: Number,
-          tuition_and_fees: Number
+          fees: Mixed,
+          tuition: Mixed,
+          tuition_and_fees: Mixed
         },
         '2019': {
-          fees: Number,
-          tuition: Number,
-          tuition_and_fees: Number
+          fees: Mixed,
+          tuition: Mixed,
+          tuition_and_fees: Mixed
         }
       },
       out_of_state: {
         '2017': {
-          fees: Number,
-          tuition: Number,
-          tuition_and_fees: Number
+          fees: Mixed,
+          tuition: Mixed,
+          tuition_and_fees: Mixed
         },
         '2018': {
-          fees: Number,
-          tuition: Number,
-          tuition_and_fees: Number
+          fees: Mixed,
+          tuition: Mixed,
+          tuition_and_fees: Mixed
         },
         '2019': {
-          fees: Number,
-          tuition: Number,
-          tuition_and_fees: Number
+          fees: Mixed,
+          tuition: Mixed,
+          tuition_and_fees: Mixed
         },
       },
       on_campus: {
         '2017': {
-          other_expenses: Number,
-          room_and_board_on_campus: Number
+          other_expenses: Mixed,
+          room_and_board_on_campus: Mixed
         },
         '2018': {
-          other_expenses: Number,
-          room_and_board_on_campus: Number
+          other_expenses: Mixed,
+          room_and_board_on_campus: Mixed
         },
         '2019': {
-          other_expenses: Number,
-          room_and_board_on_campus: Number
+          other_expenses: Mixed,
+          room_and_board_on_campus: Mixed
         },
       },
       off_campus: {
         '2017': {
-          other_expenses_off_campus: Number,
-          room_and_board_off_campus: Number
+          other_expenses_off_campus: Mixed,
+          room_and_board_off_campus: Mixed
         },
         '2018': {
-          other_expenses_off_campus: Number,
-          room_and_board_off_campus: Number
+          other_expenses_off_campus: Mixed,
+          room_and_board_off_campus: Mixed
         },
         '2019': {
-          other_expenses_off_campus: Number,
-          room_and_board_off_campus: Number
+          other_expenses_off_campus: Mixed,
+          room_and_board_off_campus: Mixed
         },
       }
     }
