@@ -4,7 +4,7 @@ const Majors = require('../models/majors')
 const UserSchoolLike = require('../models/userSchoolLike')
 
 exports.getSchools = (req, res, next) => {
-  const schoolsPerPage = process.env.SCHOOLS_PER_PAGE || 8
+  const schoolsPerPage = process.env.SCHOOLS_PER_PAGE || 10
   const page = req.query.page
   const token = req.firebaseToken
 
@@ -13,25 +13,87 @@ exports.getSchools = (req, res, next) => {
   let parsedQuery = queryString.parse(req.url)
   console.log(parsedQuery)
 
-  let query = {}
+  let mongooseQueries = {}
   let totalSchoolsFound;
 
-  Schools.find(query)
+  // exclude null values when sorting (except when default)
+  let sort = {}
+  if (parsedQuery.sortby === 'sat-ascending') {
+    mongooseQueries['general.admissions.sat.total_75th_percentile'] = {$nin: [null, '-']}
+    sort = {'general.admissions.sat.total_75th_percentile': 1}
+  } else if (parsedQuery.sortby === 'sat-descending') {
+    mongooseQueries['general.admissions.sat.total_75th_percentile'] = {$nin: [null, '-']}
+    sort = {'general.admissions.sat.total_75th_percentile': -1}
+  } else if (parsedQuery.sortby === 'tuition-ascending') {
+    mongooseQueries['general.tuition.out_of_state.2019.tuition'] = {$nin: [null, '-']}
+    sort = {'general.tuition.out_of_state.2019.tuition': 1}
+  } else if (parsedQuery.sortby === 'tuition-descending') {
+    mongooseQueries['general.tuition.out_of_state.2019.tuition'] = {$nin: [null, '-']}
+    sort = {'general.tuition.out_of_state.2019.tuition': -1}
+  }
+
+  // - state
+  if (parsedQuery.state !== undefined) {
+    mongooseQueries['general.campus.state_postid'] = parsedQuery.state
+  }
+  // - tuition
+  if (parsedQuery.tuition !== '0,60000') {
+    const tuitionStr = parsedQuery.tuition.split(',')
+    mongooseQueries['general.tuition.out_of_state.2019.tuition'] = {$gte: ~~tuitionStr[0], $lte: ~~tuitionStr[1]}
+  }
+  // - sat
+  if (parsedQuery.sat !== undefined) {
+    const satStr = parsedQuery.sat.split(',')
+    mongooseQueries['general.admissions.sat.total_75th_percentile'] = {$gte: ~~satStr[0], $lte: ~~satStr[1]}
+  }
+  // - year-type
+  let yearsQuery = []
+  if (parsedQuery.fourYear !== undefined) {
+    yearsQuery.push(
+      {'general.classifications.carnegie_size_category': {$regex: 'Four-year', $options: 'i'}}
+    )
+  }
+  if (parsedQuery.twoYear !== undefined) {
+    yearsQuery.push(
+      {'general.classifications.carnegie_size_category': {$regex: 'Two-year', $options: 'i'}}
+    )
+  }
+  if (yearsQuery.length > 0)
+    mongooseQueries['$or'] = yearsQuery
+  // - control
+  let controlQuery = []
+  if (parsedQuery.privateSchool !== undefined) {
+    controlQuery.push(
+      {'general.campus.control': {$regex: 'Private', $options: 'i'}}
+    )
+  }
+  if (parsedQuery.publicSchool !== undefined) {
+    controlQuery.push(
+      {'general.campus.control': 'Public'}
+    )
+  }
+  if (controlQuery.length > 0)
+    mongooseQueries['$or'] = controlQuery
+
+  console.log(mongooseQueries, sort)
+
+  Schools.find(mongooseQueries)
     .countDocuments()
     .then(numSchools => {
       totalSchoolsFound = numSchools
-      return Schools.find(query)
+      return Schools.find(mongooseQueries)
+        .sort(sort)
         .skip((page - 1) * schoolsPerPage)
         .limit(~~schoolsPerPage)
     })
     .then(async schools => {
-      console.log(schools)
       if (!schools) {
         const error = new Error('Failed to fetch schools')
         error.statusCode = 404
         console.log(error)
         throw error
       }
+
 
       /** TODO: Enable liking function for schools */
       // let awaitSchools = await Promise.all(

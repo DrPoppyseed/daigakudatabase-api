@@ -48,19 +48,19 @@ const schoolsSchema = new Schema({
         math_75th_percentile: Number
       },
       population: {
-        admitted_men: Number,
-        admitted_women: Number,
-        admitted_total: Number,
-        applicants_men: Number,
-        applicants_women: Number,
-        applicants_total: Number,
-        enrolled_men: Number,
-        enrolled_women: Number,
-        enrolled_total: Number,
-        num_submitting_act: Number,
-        num_submitting_sat: Number,
-        percent_submitting_act: Number,
-        percent_submitting_sat: Number
+        admitted_men: Mixed,
+        admitted_women: Mixed,
+        admitted_total: Mixed,
+        applicants_men: Mixed,
+        applicants_women: Mixed,
+        applicants_total: Mixed,
+        enrolled_men: Mixed,
+        enrolled_women: Mixed,
+        enrolled_total: Mixed,
+        num_submitting_act: Mixed,
+        num_submitting_sat: Mixed,
+        percent_submitting_act: Mixed,
+        percent_submitting_sat: Mixed
       },
       requirements: {
         admission_test_scores: Boolean,
@@ -120,9 +120,9 @@ const schoolsSchema = new Schema({
       is_member_of_naa: Boolean
     },
     students: {
-      fulltime_retention_rate: Number,
+      fulltime_retention_rate: Mixed,
       institution_size_category: String,
-      student_faculty_ratio: Number,
+      student_faculty_ratio: Mixed,
       enrollment: {
         demographics: {
           asian: Number,
