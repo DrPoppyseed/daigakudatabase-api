@@ -43,6 +43,15 @@ exports.getSchools = (req, res, next) => {
   if (parsedQuery.state !== undefined) {
     mongooseQueries['general.campus.state_postid'] = parsedQuery.state
   }
+  // - urban
+  if (parsedQuery.urban !== undefined) {
+    mongooseQueries['general.campus.urbanization_level'] = {
+      $regex: `${parsedQuery.urban
+        .charAt(0)
+        .toUpperCase()}${parsedQuery.urban.slice(1)}`,
+      $options: 'i',
+    }
+  }
   // - tuition
   if (parsedQuery.tuition !== '0,60000') {
     const tuitionStr = parsedQuery.tuition.split(',')
