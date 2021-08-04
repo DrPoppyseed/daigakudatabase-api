@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const userSchoolLikeSchema = new Schema(
   {
     userId: String,
-    school_uuid: String,
+    ipeds_unitid: String,
   },
   { timestamps: true }
 )

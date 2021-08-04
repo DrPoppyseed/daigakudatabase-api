@@ -29,14 +29,42 @@ exports.signUp = (req, res, next) => {
 
 exports.signIn = (req, res, next) => {
   const { user_id } = req.firebaseToken
-  console.log(user_id)
 
   User.findOne({ userId: user_id })
     .then(user => {
       if (!user) {
-        const error = new Error('Could not find account with user ID')
-        error.statusCode = 404
-        throw error
+        if (req.header('X-Is-Google-SignIn')) {
+          // if signIn with google is true and no corresponding user is created yet,
+          // create new user w/ info from decoded firebaseToken
+          const user = new User({
+            userId: req.firebaseToken.uid,
+            email: req.firebaseToken.email,
+            emailVerified: req.firebaseToken.email_verified,
+            thumbnail: req.firebaseToken.picture,
+            profileStates: {
+              status: 0,
+            },
+            personalAppState: {
+              theme: 0,
+            },
+          })
+          return user
+            .save()
+            .then(user => {
+              res.status(201).json({
+                message: 'New user created via Google Auth',
+                userId: user.userId,
+              })
+            })
+            .catch(err => {
+              if (!err.statusCode) err.statusCode = 500
+              next(err)
+            })
+        } else {
+          const error = new Error('Could not find account with user ID')
+          error.statusCode = 404
+          throw error
+        }
       }
       res.status(200).json({ message: 'User signed in', user: user })
     })
@@ -53,13 +81,15 @@ exports.likeSchool = (req, res, next) => {
   if (!user_id)
     res.status(401).json({ message: 'Invalid url: userId not found' })
 
-  const schoolId = req.query.schoolId
-  if (!schoolId)
-    res.status(401).json({ message: 'Invalid url: schoolId not found' })
+  console.log(user_id)
+
+  const ipeds_unitid = req.query.ipeds_unitid
+  if (!ipeds_unitid)
+    res.status(401).json({ message: 'Invalid url: ipeds_unitid not found' })
 
   const userSchoolLike = new UserSchoolLike({
     userId: user_id,
-    school_uuid: schoolId,
+    ipeds_unitid: ipeds_unitid,
   })
 
   userSchoolLike
@@ -72,14 +102,14 @@ exports.likeSchool = (req, res, next) => {
             error.statusCode = 404
             throw error
           } else {
-            user.likedSchools.push(schoolId)
+            user.likedSchools.push(ipeds_unitid)
             user.save()
           }
         })
         .then(() => {
           res.status(201).json({
             message: 'school liked',
-            schoolId: userSchoolLike.school_uuid,
+            ipeds_unitid: userSchoolLike.ipeds_unitid,
           })
         })
         .catch(err => {
@@ -97,9 +127,11 @@ exports.likeSchool = (req, res, next) => {
 
 exports.unlikeSchool = (req, res, next) => {
   const { user_id } = req.firebaseToken
-  const schoolId = req.query.schoolId
+  const ipeds_unitid = req.query.ipeds_unitid
 
-  UserSchoolLike.deleteOne({ userId: user_id, school_uuid: schoolId })
+  console.log(ipeds_unitid)
+
+  UserSchoolLike.deleteOne({ userId: user_id, ipeds_unitid: ipeds_unitid })
     .then(() => {
       User.findOne({ userId: user_id })
         .then(user => {
@@ -109,7 +141,7 @@ exports.unlikeSchool = (req, res, next) => {
             throw error
           } else {
             user.likedSchools = user.likedSchools.filter(
-              school => school !== schoolId
+              school => school !== ipeds_unitid
             )
             user.save()
           }
