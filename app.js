@@ -8,7 +8,6 @@ const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const favicon = require('serve-favicon')
 const admin = require('firebase-admin')
-const serviceAccount = require(process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH)
 
 const usersRoutes = require('./routes/users')
 const schoolsRoutes = require('./routes/schools')
@@ -27,8 +26,10 @@ app.use(
 )
 app.use(express.static(__dirname + '/public'))
 
+const serviceAccount = process.env.FIREBASE_SA_CREDENTIALS
+
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(JSON.parse(serviceAccount)),
 })
 
 app.use((req, res, next) => {
