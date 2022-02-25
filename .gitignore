@@ -1,5 +1,5 @@
 # dependencies
-**/node_modules
+/node_modules
 
 # testing
 /coverage
@@ -16,10 +16,3 @@
 .env.production.local*
 
 /.eslintcache
-
-# /server/.env
-
-/*.env
-/*.env
-
-/keys
