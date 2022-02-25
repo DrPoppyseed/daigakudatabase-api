@@ -1,7 +1,7 @@
 # foris-collegesearch-api
 
-- Backend api for https://foris.netlify.app
-- Connects to MongoDB 
-- Implements authentication with Firebase Auth
-- Reads Json Web Tokens for secure api connections (sorting whether user is logged in or not)
-- Handles errors 
+There are two non-compatible versions of the api. The older version is on the main branch, and the newer, on the no-images-setup branch.
+
+
+- no-images-setup branch is the backend for https://daigakudatabase.com (much faster loading time with D3.js visualisations)
+- main branch is the backend for https://foris.netlify.app (super slow initial loading time, but with more information about the colleges included)
