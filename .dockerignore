@@ -1,7 +1,23 @@
+# dependencies
 /node_modules
+.yarn-error.log
 
-.git
+# testing
+/coverage
 
-*.md
+# build files
+/dist
 
-.gitignore
+# environment variables
+.env
+*.env
+
+# machine
+.DS_Store
+
+# workstation 
+.idea
+
+# launch scripts for other platforms
+Procfile
+.profile

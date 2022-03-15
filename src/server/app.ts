@@ -1,0 +1,61 @@
+import dotenv from 'dotenv'
+import handleError from './middleware/handleError'
+import routes from './routes'
+import mongodb from '../config/mongodb'
+
+import express, { Request, Response } from 'express'
+import helmet from 'helmet'
+import cookieParser from 'cookie-parser'
+import logger from 'morgan'
+import admin from 'firebase-admin'
+import rateLimit from 'express-rate-limit'
+import cors from 'cors'
+import morganLogger from './middleware/morganLogger'
+
+dotenv.config()
+
+const app = express()
+
+app.set('trust proxy', 1)
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW as string),
+  max: parseInt(process.env.RATE_LIMIT_MAX as string),
+})
+app.use(limiter)
+
+app.use(logger('dev'))
+app.use(helmet())
+app.use(
+  cors({
+    origin: true,
+    secure: process.env.NODE_ENV !== 'development',
+  })
+)
+app.use(cookieParser())
+app.use(morganLogger)
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static('public'))
+
+admin.initializeApp({
+  credential: admin.credential.cert(
+    JSON.parse(process.env.FIREBASE_SA_CREDENTIALS)
+  ),
+})
+
+mongodb()
+  .then(() => {
+    app.use(routes)
+
+    app.use(handleError)
+
+    app.get('/', (req: Request, res: Response) => {
+      logger.info('Console is working properly!')
+      res.status(200).send('Server is running!')
+    })
+  })
+  .catch(error => {
+    logger.error(error)
+  })
+
+export default app

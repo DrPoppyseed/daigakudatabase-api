@@ -1,11 +1,15 @@
 # dependencies
 /node_modules
+.yarn
 
 # testing
 /coverage
 
 # production
 /build
+
+# workspace
+.idea
 
 # misc
 .DS_Store

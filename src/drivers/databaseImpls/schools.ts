@@ -1,0 +1,242 @@
+import { School } from '../../models/Schools'
+import { Schema, Document, model } from 'mongoose'
+
+const SchoolsSchema = new Schema<School & Document>({
+  general: {
+    name_en: String,
+    ff_name: String,
+    forbes_desc: String,
+    forbes_uri: String,
+    ipeds_unitid: String,
+    opeid: String,
+    opeid6: String,
+    local_url: String,
+    aliases: [String],
+    unique_flags: [String],
+    campus: {
+      address: String,
+      address_short: String,
+      bea_regions: String,
+      city: String,
+      control: String,
+      county: String,
+      geolocation: {
+        longitude: Number,
+        latitude: Number,
+      },
+      religious_affiliates: String,
+      school_system: String,
+      state: String,
+      state_postid: String,
+      urbanization_level: String,
+      zip: String,
+    },
+    admissions: {
+      act: {
+        comp_25th_percentile: Number,
+        comp_75th_percentile: Number,
+        eng_25th_percentile: Number,
+        eng_75th_percentile: Number,
+        math_25th_percentile: Number,
+        math_75th_percentile: Number,
+      },
+      sat: {
+        eng_25th_percentile: Number,
+        eng_75th_percentile: Number,
+        math_25th_percentile: Number,
+        math_75th_percentile: Number,
+      },
+      population: {
+        admitted_men: Schema.Types.Mixed,
+        admitted_women: Schema.Types.Mixed,
+        admitted_total: Schema.Types.Mixed,
+        applicants_men: Schema.Types.Mixed,
+        applicants_women: Schema.Types.Mixed,
+        applicants_total: Schema.Types.Mixed,
+        enrolled_men: Schema.Types.Mixed,
+        enrolled_women: Schema.Types.Mixed,
+        enrolled_total: Schema.Types.Mixed,
+        num_submitting_act: Schema.Types.Mixed,
+        num_submitting_sat: Schema.Types.Mixed,
+        percent_submitting_act: Schema.Types.Mixed,
+        percent_submitting_sat: Schema.Types.Mixed,
+      },
+      requirements: {
+        admission_test_scores: Boolean,
+        college_preparatory_programs: Boolean,
+        formal_demonstration: Boolean,
+        gpa: Boolean,
+        other_tests: Boolean,
+        recommendation_letters: Boolean,
+        school_rank: Boolean,
+        school_record: Boolean,
+        toefl: Boolean,
+      },
+      undergrad_application_fee: Number,
+    },
+    classifications: {
+      carnegie_classification: String,
+      carnegie_size_category: String,
+    },
+    education: {
+      calendar_system: String,
+      program_sizes: Object,
+    },
+    faculty: {
+      breakdown_by_rank: {
+        assistant_professors: Number,
+        associate_professors: Number,
+        other: Number,
+        professors: Number,
+      },
+      fulltime_instructional_staff: Number,
+    },
+    housing: {
+      board_meal_plan: Boolean,
+      meals_per_week_in_board: Number,
+      oncampus_dorm_capacity: Number,
+      provides_oncampus_housing: Boolean,
+      yearly_board_charge: Number,
+      yearly_room_and_board_charge: Number,
+      yearly_room_charge: Number,
+    },
+    library: {
+      digital_books: Number,
+      digital_databases: Number,
+      digital_media: Number,
+      physical_books: Number,
+      physical_media: Number,
+    },
+    official_resources: {
+      admissions: String,
+      financial_aid: String,
+      homepage: String,
+      net_price_calculator: String,
+      online_applications: String,
+    },
+    sports: {
+      athletic_organizations: [String],
+      is_member_of_naa: Boolean,
+    },
+    students: {
+      fulltime_retention_rate: Schema.Types.Mixed,
+      institution_size_category: String,
+      student_faculty_ratio: Schema.Types.Mixed,
+      enrollment: {
+        demographics: {
+          asian: Number,
+          black: Number,
+          hispanic: Number,
+          international: Number,
+          other: Number,
+          white: Number,
+        },
+        entry_age_avg: Number,
+        men: Number,
+        women: Number,
+        size: String,
+      },
+      headcount: {
+        total_men: Number,
+        total_women: Number,
+        breakdown_by_race: {
+          american_indian_or_alaska_native: Number,
+          asian: Number,
+          black_or_african_american: Number,
+          hispanic_or_latino: Number,
+          native_hawaiian_or_other_pacific_islander: Number,
+          two_or_more: Number,
+          white: Number,
+        },
+        breakdown_by_race_and_sex: {
+          american_indian_or_alaska_native_men: Number,
+          american_indian_or_alaska_native_women: Number,
+          asian_men: Number,
+          asian_women: Number,
+          black_or_african_american_men: Number,
+          black_or_african_american_women: Number,
+          hispanic_or_latino_men: Number,
+          hispanic_or_latino_women: Number,
+          native_hawaiian_or_other_pacific_islander_men: Number,
+          native_hawaiian_or_other_pacific_islander_women: Number,
+          two_or_more_men: Number,
+          two_or_more_women: Number,
+          white_men: Number,
+          white_women: Number,
+        },
+      },
+    },
+    tuition: {
+      books_and_supplies: {
+        '2017': Schema.Types.Mixed,
+        '2018': Schema.Types.Mixed,
+        '2019': Schema.Types.Mixed,
+      },
+      in_state: {
+        '2017': {
+          fees: Schema.Types.Mixed,
+          tuition: Schema.Types.Mixed,
+          tuition_and_fees: Schema.Types.Mixed,
+        },
+        '2018': {
+          fees: Schema.Types.Mixed,
+          tuition: Schema.Types.Mixed,
+          tuition_and_fees: Schema.Types.Mixed,
+        },
+        '2019': {
+          fees: Schema.Types.Mixed,
+          tuition: Schema.Types.Mixed,
+          tuition_and_fees: Schema.Types.Mixed,
+        },
+      },
+      out_of_state: {
+        '2017': {
+          fees: Schema.Types.Mixed,
+          tuition: Schema.Types.Mixed,
+          tuition_and_fees: Schema.Types.Mixed,
+        },
+        '2018': {
+          fees: Schema.Types.Mixed,
+          tuition: Schema.Types.Mixed,
+          tuition_and_fees: Schema.Types.Mixed,
+        },
+        '2019': {
+          fees: Schema.Types.Mixed,
+          tuition: Schema.Types.Mixed,
+          tuition_and_fees: Schema.Types.Mixed,
+        },
+      },
+      on_campus: {
+        '2017': {
+          other_expenses: Schema.Types.Mixed,
+          room_and_board_on_campus: Schema.Types.Mixed,
+        },
+        '2018': {
+          other_expenses: Schema.Types.Mixed,
+          room_and_board_on_campus: Schema.Types.Mixed,
+        },
+        '2019': {
+          other_expenses: Schema.Types.Mixed,
+          room_and_board_on_campus: Schema.Types.Mixed,
+        },
+      },
+      off_campus: {
+        '2017': {
+          other_expenses_off_campus: Schema.Types.Mixed,
+          room_and_board_off_campus: Schema.Types.Mixed,
+        },
+        '2018': {
+          other_expenses_off_campus: Schema.Types.Mixed,
+          room_and_board_off_campus: Schema.Types.Mixed,
+        },
+        '2019': {
+          other_expenses_off_campus: Schema.Types.Mixed,
+          room_and_board_off_campus: Schema.Types.Mixed,
+        },
+      },
+    },
+  },
+  rankings: Object,
+})
+
+export default model<School & Document>('Schools', SchoolsSchema)
