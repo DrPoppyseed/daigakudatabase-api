@@ -6,7 +6,7 @@ export const CANNOT_ACCESS_ERROR_MESSAGE =
 export const BAD_REQUEST_ERROR_MESSAGE =
   'リクエストに何かしらの不備があります。'
 
-export const MISSING_TOKEN_ERROR_MESSAGE = 'Tokenがありません。'
+export const MISSING_TOKEN_ERROR_MESSAGE = 'リクエストにトークンがありません。'
 
 export const BAD_VALUE_ERROR_MESSAGE =
   'ユーザが入力された値を受け付けることができません。'

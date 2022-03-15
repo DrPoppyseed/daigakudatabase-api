@@ -1,8 +1,11 @@
-const User = require('../../models/user')
-const UserSchoolLike = require('../../models/userSchoolLike')
+import UserImpl from '../../drivers/databaseImpls/userImpl'
+import UserSchoolLikeImpl from '../../drivers/databaseImpls/userSchoolLikeImpl'
+import { NextFunction, Request, Response } from 'express'
+import { ResourceNotFoundError } from '../../utils/error'
+import logger from '../../config/logger'
 
-exports.signUp = (req, res, next) => {
-  const user = new User({
+export const signUp = (req: Request, res: Response, next: NextFunction) => {
+  const user = new UserImpl({
     userId: req.body.user.uid,
     email: req.body.user.email,
     emailVerified: req.body.user.emailVerified || false,
@@ -27,20 +30,20 @@ exports.signUp = (req, res, next) => {
     })
 }
 
-exports.signIn = (req, res, next) => {
-  const { user_id } = req.firebaseToken
+export const signIn = (req: Request, res: Response, next: NextFunction) => {
+  const { email, email_verified, picture, user_id } = <any>req.firebaseToken
 
-  User.findOne({ userId: user_id })
+  UserImpl.findOne({ userId: user_id })
     .then(user => {
       if (!user) {
         if (req.header('X-Is-Google-SignIn')) {
-          // if signIn with google is true and no corresponding user is created yet,
+          // if signIn with Google is true and no corresponding user is created yet,
           // create new user w/ info from decoded firebaseToken
-          const user = new User({
-            userId: req.firebaseToken.uid,
-            email: req.firebaseToken.email,
-            emailVerified: req.firebaseToken.email_verified,
-            thumbnail: req.firebaseToken.picture,
+          const user = new UserImpl({
+            userId: user_id,
+            email: email,
+            emailVerified: email_verified,
+            thumbnail: picture,
             profileStates: {
               status: 0,
             },
@@ -61,9 +64,7 @@ exports.signIn = (req, res, next) => {
               next(err)
             })
         } else {
-          const error = new Error('Could not find account with user ID')
-          error.statusCode = 404
-          throw error
+          throw new ResourceNotFoundError()
         }
       }
       res.status(200).json({ message: 'User signed in', user: user })
@@ -76,18 +77,18 @@ exports.signIn = (req, res, next) => {
     })
 }
 
-exports.likeSchool = (req, res, next) => {
-  const { user_id } = req.firebaseToken
+export const likeSchool = (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = <any>req.firebaseToken
   if (!user_id)
     res.status(401).json({ message: 'Invalid url: userId not found' })
 
   console.log(user_id)
 
-  const ipeds_unitid = req.query.ipeds_unitid
+  const ipeds_unitid = <string>req.query.ipeds_unitid
   if (!ipeds_unitid)
     res.status(401).json({ message: 'Invalid url: ipeds_unitid not found' })
 
-  const userSchoolLike = new UserSchoolLike({
+  const userSchoolLike = new UserSchoolLikeImpl({
     userId: user_id,
     ipeds_unitid: ipeds_unitid,
   })
@@ -95,12 +96,11 @@ exports.likeSchool = (req, res, next) => {
   userSchoolLike
     .save()
     .then(userSchoolLike => {
-      User.findOne({ userId: user_id })
+      UserImpl.findOne({ userId: user_id })
         .then(user => {
           if (!user) {
-            const error = new Error('Could not find account with user ID')
-            error.statusCode = 404
-            throw error
+            logger.error('user not found')
+            throw new ResourceNotFoundError()
           } else {
             user.likedSchools.push(ipeds_unitid)
             user.save()
@@ -125,20 +125,23 @@ exports.likeSchool = (req, res, next) => {
     })
 }
 
-exports.unlikeSchool = (req, res, next) => {
-  const { user_id } = req.firebaseToken
+export const unlikeSchool = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.firebaseToken as any
   const ipeds_unitid = req.query.ipeds_unitid
 
   console.log(ipeds_unitid)
 
-  UserSchoolLike.deleteOne({ userId: user_id, ipeds_unitid: ipeds_unitid })
+  UserSchoolLikeImpl.deleteOne({ userId: user_id, ipeds_unitid: ipeds_unitid })
     .then(() => {
-      User.findOne({ userId: user_id })
+      UserImpl.findOne({ userId: user_id })
         .then(user => {
           if (!user) {
-            const error = new Error('Could not find account with user ID')
-            error.statusCode = 404
-            throw error
+            logger.error('user not found')
+            throw new ResourceNotFoundError()
           } else {
             user.likedSchools = user.likedSchools.filter(
               school => school !== ipeds_unitid

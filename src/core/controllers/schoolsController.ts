@@ -1,18 +1,22 @@
 import queryString from 'query-string'
 import SchoolsImpl from '../../drivers/databaseImpls/schoolsImpl'
 import UserSchoolLikeImpl from '../../drivers/databaseImpls/userSchoolLikeImpl'
+import { NextFunction, Response, Request } from 'express'
+import { ResourceNotFoundError } from '../../utils/error'
+import { KeyValueObject } from '../../types/common'
 
-export const getSchools = (req, res, next) => {
-  const schoolsPerPage = process.env.SCHOOLS_PER_PAGE || 10
-  const page = req.query.page
+export const getSchools = (req: Request, res: Response, next: NextFunction) => {
+  const schoolsPerPage: number =
+    parseInt(process.env.SCHOOLS_PER_PAGE as string, 10) || 10
+  const page: number = parseInt(<string>req.query.page, 10)
   const token = req.firebaseToken
 
-  let userId = !!token ? token.user_id : null
+  const userId = token ? token.user_id : null
 
-  let parsedQuery = queryString.parse(req.url)
+  const parsedQuery: KeyValueObject = queryString.parse(req.url)
 
-  let mongooseQueries = {}
-  let totalSchoolsFound
+  const mongooseQueries: any = {}
+  let totalSchoolsFound: any
 
   // exclude null values when sorting (except when default)
   let sort = {}
@@ -68,7 +72,7 @@ export const getSchools = (req, res, next) => {
     }
   }
   // - year-type
-  let yearsQuery = []
+  const yearsQuery = []
   if (parsedQuery.fourYear !== undefined) {
     yearsQuery.push({
       'general.classifications.carnegie_size_category': {
@@ -87,7 +91,7 @@ export const getSchools = (req, res, next) => {
   }
   if (yearsQuery.length > 0) mongooseQueries['$or'] = yearsQuery
   // - control
-  let controlQuery = []
+  const controlQuery = []
   if (parsedQuery.privateSchool !== undefined) {
     controlQuery.push({
       'general.campus.control': { $regex: 'Private', $options: 'i' },
@@ -109,13 +113,10 @@ export const getSchools = (req, res, next) => {
     })
     .then(async schools => {
       if (!schools) {
-        const error = new Error('Failed to fetch schools')
-        error.statusCode = 404
-        console.log(error)
-        throw error
+        throw new ResourceNotFoundError()
       }
 
-      let awaitSchools = await Promise.all(
+      const awaitSchools = await Promise.all(
         schools.map(async school => {
           return await UserSchoolLikeImpl.exists({
             userId: userId,

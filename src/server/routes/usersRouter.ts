@@ -1,16 +1,21 @@
 import express from 'express'
 import authenticateJWT from '../middleware/authenticateJWT'
+import {
+  likeSchool,
+  signIn,
+  signUp,
+  unlikeSchool,
+} from '../../core/controllers/usersController'
+import { shallowVerify } from '../middleware/shallowVerify'
 
 const usersRouter = express.Router()
 
-import usersController from '../../core/controllers/usersController'
+usersRouter.put('/', authenticateJWT, shallowVerify, signUp)
 
-usersRouter.put('/', authenticateJWT, usersController.signUp)
+usersRouter.get('/', authenticateJWT, shallowVerify, signIn)
 
-usersRouter.get('/', authenticateJWT, usersController.signIn)
+usersRouter.get('/like', authenticateJWT, shallowVerify, likeSchool)
 
-usersRouter.get('/like', authenticateJWT, usersController.likeSchool)
-
-usersRouter.get('/unlike', authenticateJWT, usersController.unlikeSchool)
+usersRouter.get('/unlike', authenticateJWT, shallowVerify, unlikeSchool)
 
 export default usersRouter

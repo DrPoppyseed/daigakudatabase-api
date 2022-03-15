@@ -6,11 +6,11 @@ import mongodb from '../config/mongodb'
 import express, { Request, Response } from 'express'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
-import logger from 'morgan'
 import admin from 'firebase-admin'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import morganLogger from './middleware/morganLogger'
+import logger from '../config/logger'
 
 dotenv.config()
 
@@ -23,14 +23,14 @@ const limiter = rateLimit({
 })
 app.use(limiter)
 
-app.use(logger('dev'))
 app.use(helmet())
-app.use(
-  cors({
-    origin: true,
-    secure: process.env.NODE_ENV !== 'development',
-  })
-)
+
+const corsOption = {
+  origin: true,
+  secure: process.env.NODE_ENV !== 'development',
+}
+
+app.use(cors(corsOption))
 app.use(cookieParser())
 app.use(morganLogger)
 app.use(express.json())
@@ -39,7 +39,7 @@ app.use(express.static('public'))
 
 admin.initializeApp({
   credential: admin.credential.cert(
-    JSON.parse(process.env.FIREBASE_SA_CREDENTIALS)
+    JSON.parse(process.env.FIREBASE_SA_CREDENTIALS as string)
   ),
 })
 

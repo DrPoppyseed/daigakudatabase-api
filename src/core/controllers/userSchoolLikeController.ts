@@ -25,7 +25,7 @@ export default class UserSchoolLikeController {
 
     try {
       const schoolLikes = await this.getUserSchoolLikesUsecase.call(userId)
-      const likedSchoolIds = schoolLikes.map(el => el.ipeds_unitid)
+      const likedSchoolIds = schoolLikes?.map(el => el.ipeds_unitid)
       res.status(200).json({
         schoolIds: likedSchoolIds,
       })

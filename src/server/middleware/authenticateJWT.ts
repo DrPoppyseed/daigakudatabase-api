@@ -7,7 +7,7 @@ const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
   const encodedToken = authHeader && authHeader.split(' ')[1]
 
   if (encodedToken == null) {
-    req.firebaseToken = null // no token
+    req.firebaseToken = null as any
     next()
   } else {
     admin
@@ -18,7 +18,7 @@ const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
         next()
       })
       .catch(err => {
-        req.firebaseToken = null
+        req.firebaseToken = null as any
         next()
       })
   }

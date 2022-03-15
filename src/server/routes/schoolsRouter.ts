@@ -1,8 +1,8 @@
 import express from 'express'
-
-const schoolsRouter = express.Router()
 import authenticateJWT from '../middleware/authenticateJWT'
 import { getSchools } from '../../core/controllers/schoolsController'
+
+const schoolsRouter = express.Router()
 
 schoolsRouter.get('/', authenticateJWT, getSchools)
 
