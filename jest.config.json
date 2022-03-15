@@ -2,7 +2,5 @@
   "preset": "ts-jest",
   "testEnvironment": "node",
   "collectCoverage": true,
-  "collectCoverageFrom": [
-    "<rootDir>/src/**/*.ts"
-  ]
+  "collectCoverageFrom": ["<rootDir>/src/**/*.ts"]
 }

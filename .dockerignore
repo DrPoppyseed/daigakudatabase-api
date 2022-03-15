@@ -1,6 +1,5 @@
 # dependencies
 /node_modules
-.yarn-error.log
 
 # testing
 /coverage
