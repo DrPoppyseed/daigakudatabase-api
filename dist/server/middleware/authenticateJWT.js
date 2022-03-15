@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var firebase_admin_1 = __importDefault(require("firebase-admin"));
-exports.authenticateJWT = function (req, res, next) {
+var authenticateJWT = function (req, res, next) {
     var authHeader = req.headers['authorization'];
     var encodedToken = authHeader && authHeader.split(' ')[1];
     if (encodedToken == null) {
@@ -25,3 +25,4 @@ exports.authenticateJWT = function (req, res, next) {
         });
     }
 };
+exports.default = authenticateJWT;

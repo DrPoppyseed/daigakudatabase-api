@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 
 import admin from 'firebase-admin'
 
-exports.authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
+const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization']
   const encodedToken = authHeader && authHeader.split(' ')[1]
 
@@ -23,3 +23,5 @@ exports.authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
       })
   }
 }
+
+export default authenticateJWT

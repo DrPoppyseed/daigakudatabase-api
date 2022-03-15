@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -45,17 +46,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
-var queryString = require('query-string');
-var Schools = require('../../models/schools');
-var Majors = require('../../models/majors');
-var UserSchoolLike = require('../../models/userSchoolLike');
-exports.getSchools = function (req, res, next) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getSchools = void 0;
+var query_string_1 = __importDefault(require("query-string"));
+var schoolsImpl_1 = __importDefault(require("../../drivers/databaseImpls/schoolsImpl"));
+var userSchoolLikeImpl_1 = __importDefault(require("../../drivers/databaseImpls/userSchoolLikeImpl"));
+var getSchools = function (req, res, next) {
     var schoolsPerPage = process.env.SCHOOLS_PER_PAGE || 10;
     var page = req.query.page;
     var token = req.firebaseToken;
     var userId = !!token ? token.user_id : null;
-    var parsedQuery = queryString.parse(req.url);
+    var parsedQuery = query_string_1.default.parse(req.url);
     var mongooseQueries = {};
     var totalSchoolsFound;
     // exclude null values when sorting (except when default)
@@ -145,18 +149,17 @@ exports.getSchools = function (req, res, next) {
     }
     if (controlQuery.length > 0)
         mongooseQueries['$or'] = controlQuery;
-    Schools.find(mongooseQueries)
+    schoolsImpl_1.default.find(mongooseQueries)
         .countDocuments()
         .then(function (numSchools) {
         totalSchoolsFound = numSchools;
-        return Schools.find(mongooseQueries)
+        return schoolsImpl_1.default.find(mongooseQueries)
             .sort(sort)
             .skip((page - 1) * schoolsPerPage)
             .limit(~~schoolsPerPage);
     })
-        .then(function (schools) { return __awaiter(_this, void 0, void 0, function () {
+        .then(function (schools) { return __awaiter(void 0, void 0, void 0, function () {
         var error, awaitSchools;
-        var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -166,10 +169,10 @@ exports.getSchools = function (req, res, next) {
                         console.log(error);
                         throw error;
                     }
-                    return [4 /*yield*/, Promise.all(schools.map(function (school) { return __awaiter(_this, void 0, void 0, function () {
+                    return [4 /*yield*/, Promise.all(schools.map(function (school) { return __awaiter(void 0, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0: return [4 /*yield*/, UserSchoolLike.exists({
+                                    case 0: return [4 /*yield*/, userSchoolLikeImpl_1.default.exists({
                                             userId: userId,
                                             ipeds_unitid: school.general.ipeds_unitid,
                                         })
@@ -189,7 +192,6 @@ exports.getSchools = function (req, res, next) {
                         }); }))];
                 case 1:
                     awaitSchools = _a.sent();
-                    console.log(awaitSchools);
                     res.status(200).json({
                         message: 'Schools fetched!',
                         totalSchoolsFound: totalSchoolsFound,
@@ -206,76 +208,4 @@ exports.getSchools = function (req, res, next) {
         next(err);
     });
 };
-// exports.getMyPage = (req, res, next) => {
-//   const userId = req.body.userId
-//   const page = req.params.page || 1
-//   const schoolIds = req.body.schoolIds
-//
-//   const SCHOOLS_PER_PAGE = 6
-//
-//   Schools.find({ opeid6: { $in: [...schoolIds] } })
-//     .skip((page - 1) * SCHOOLS_PER_PAGE)
-//     .limit(SCHOOLS_PER_PAGE)
-//     .then(result => {
-//       res.status(200).json({
-//         message: 'Liked schools fetched!',
-//         schools: result,
-//       })
-//     })
-//     .catch(err => {
-//       console.log(err)
-//       if (!err.statusCode) err.statusCode = 500
-//       next(err)
-//     })
-// }
-//
-// exports.getSchoolById = (req, res, next) => {
-//   const schoolId = req.params.schoolId
-//   const token = req.firebaseToken
-//   console.log('🚀 ~ file: schoolsController.js ~ line 188 ~ token', token)
-//   let userId = !!token ? token.user_id : null
-//
-//   Schools.find({
-//     'institutionData.url': schoolId,
-//   })
-//     .then(async school => {
-//       const exists = await UserSchoolLike.exists({
-//         userId: userId,
-//         school_uuid: school[0].uuid,
-//       })
-//
-//       if (exists) {
-//         res.status(200).json({
-//           message: 'School report fetched',
-//           schoolReport: { ...school, isLiked: true },
-//         })
-//       } else {
-//         res.status(200).json({
-//           message: 'School report fetched',
-//           schoolReport: { ...school, isLiked: false },
-//         })
-//       }
-//     })
-//     .catch(err => {
-//       console.log(err)
-//       if (!err.statusCode) err.statusCode = 500
-//       next(err)
-//     })
-// }
-//
-// exports.getMajorsById = (req, res, next) => {
-//   const schoolId = req.params.schoolId
-//   // schoolId for getMajorsById is uuid
-//   Majors.findOne({ uuid: schoolId })
-//     .then(async majors => {
-//       res.status(200).json({
-//         message: 'Majors fetched',
-//         majors: majors,
-//       })
-//     })
-//     .catch(err => {
-//       console.log(err)
-//       if (!err.statusCode) err.statusCode = 500
-//       next(err)
-//     })
-// }
+exports.getSchools = getSchools;
