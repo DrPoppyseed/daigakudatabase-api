@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ES6",
-    "outDir": "dist",
+    "module": "commonjs",
+    "target": "esnext",
+    "outDir": "build",
     "sourceMap": true,
     "strict": true,
     "resolveJsonModule": true,

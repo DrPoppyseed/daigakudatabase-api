@@ -1,6 +1,6 @@
 # dependencies
 /node_modules
-.yarn
+.pnpm-store
 
 # testing
 /coverage
@@ -12,12 +12,8 @@
 # workspace
 .idea
 
-# misc
-.DS_Store
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local*
+# machine specific files
+**/.DS_Store
 
-/.eslintcache
+# keys, secrets, and env vars
+.env
