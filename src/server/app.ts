@@ -16,14 +16,13 @@ dotenv.config()
 
 const app = express()
 
+app.use(helmet())
 app.set('trust proxy', 1)
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW as string),
   max: parseInt(process.env.RATE_LIMIT_MAX as string),
 })
 app.use(limiter)
-
-app.use(helmet())
 
 const corsOption = {
   origin: true,
@@ -35,7 +34,6 @@ app.use(cookieParser())
 app.use(morganLogger)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(express.static('public'))
 
 admin.initializeApp({
   credential: admin.credential.cert(

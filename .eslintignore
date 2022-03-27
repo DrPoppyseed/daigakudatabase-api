@@ -1,4 +1,4 @@
-/dist
+/build
 /node_modules
 /coverage
-jest.config.json
+jest-mongodb-config.json

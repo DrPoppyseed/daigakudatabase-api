@@ -8,28 +8,18 @@ services:
         - NODE_ENV=development
         - PORT=8080
       target: dev
-    command: yarn start
+    command: pnpm start
     env_file: .env
     image: daigakudatabase-api:dev
     platform: linux/x86_64
     ports:
-      - 80:80
+      - 8080:8080
     volumes:
       - .:/app
-      # bind-mounting the package.json and package-lock.json files
-      # allows for smoother local development due because tsc-watch
-      # will work intuitively like in any other setting.
       - ./package.json:/app/package.json
-      - ./yarn.lock:/app/yarn.lock
-      # prevents host node_modules from accidentally getting mounted
-      # to container. Helps when you want to use node/yarn outside like
-      # when testing/linting
-      - notused:/app/node_modules
     environment:
       - NODE_ENV=development
       - PORT=8080
-    healthcheck:
-      disable: true
 
 volumes:
   notused:

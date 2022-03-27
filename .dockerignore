@@ -1,22 +1,18 @@
 # dependencies
 /node_modules
+.pnpm-store
 
 # testing
 /coverage
 
 # build files
-/dist
+/build
 
 # environment variables
 .env
-*.env
 
 # machine
-.DS_Store
+**/.DS_Store
 
-# workstation 
+# workstation
 .idea
-
-# launch scripts for other platforms
-Procfile
-.profile
